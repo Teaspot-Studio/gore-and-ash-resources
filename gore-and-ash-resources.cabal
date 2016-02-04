@@ -26,6 +26,8 @@ library
                     , exceptions >= 0.8.2.1
                     , gore-and-ash >= 1.1.0.1
                     , mtl >= 2.2.1
+                    , unordered-containers
+                    , text
                     
   default-extensions: 
                       DeriveGeneric
@@ -34,3 +36,4 @@ library
                       MultiParamTypeClasses
                       TypeFamilies
                       UndecidableInstances
+                      RecordWildCards

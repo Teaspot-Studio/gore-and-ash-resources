@@ -12,18 +12,31 @@ module Game.GoreAndAsh.Resources.API(
   ) where
 
 import Control.Monad.Trans 
+import Control.Monad.State.Strict
+import qualified Data.HashMap.Strict as H
 
-import Game.GoreAndAsh.Resources.Module 
+import Game.GoreAndAsh.Resources.Module
+import Game.GoreAndAsh.Resources.State
+
 
 -- | Low level monadic API for module.
 --
 -- Note: does not require 'm' to be 'IO' monad.
 class Monad m => MonadResources m where 
   -- | stab method, temporary
-  resourcesStab :: m ()
+  resourcesIsCached :: ResPath -> m Bool
+  resourcesToCache :: (Resourcable a) => a -> m ()
+  resourcesFromCache :: (Resourcable a) => ResPath -> m (Either String a)
 
 instance {-# OVERLAPPING #-} Monad m => MonadResources (ResourcesT s m) where
-  resourcesStab = return ()
+  resourcesIsCached rp = do
+    s <- get
+    let resMap = resourcesCache s
+    return $ H.member rp resMap
+  resourcesToCache _ = return ()
+  resourcesFromCache _ = return $ Left "undefined"
 
 instance {-# OVERLAPPABLE #-} (Monad (mt m), MonadResources m, MonadTrans mt) => MonadResources (mt m) where 
-  resourcesStab = lift resourcesStab
+  resourcesIsCached rp = lift $ resourcesIsCached rp
+  resourcesToCache a = lift $ resourcesToCache a
+  resourcesFromCache rp = lift $ resourcesFromCache rp

@@ -46,7 +46,7 @@ instance GameModule m s => GameModule (ResourcesT s m) (ResourcesState s) where
     ((a, s'), nextState) <- runModule (runStateT m s) (resourcesNextState s)
     return (a, s' {
         resourcesNextState = nextState 
-      })  
+      })
   
   newModuleState = emptyResourcesState <$> newModuleState
   withModule _ = id
